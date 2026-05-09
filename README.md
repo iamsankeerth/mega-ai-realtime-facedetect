@@ -19,6 +19,14 @@ Containerized backend API that accepts a video feed, detects faces without OpenC
                                          └─────────────────┘
 ```
 
+## Live Deployment
+
+| Service | URL |
+|---------|-----|
+| Frontend | **https://mega-ai-realtime-facedetect-frontend.onrender.com** |
+| Backend API | **https://mega-ai-realtime-facedetect.onrender.com** |
+| API Docs | `https://mega-ai-realtime-facedetect.onrender.com/docs` |
+
 ## Quick Start
 
 ### Prerequisites
