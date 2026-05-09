@@ -1,8 +1,9 @@
-from fastapi import FastAPI, File, UploadFile, WebSocket
-from fastapi.responses import StreamingResponse
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-import io
-import asyncio
+
+from app.api import ingest, video, roi
+from app.infrastructure.db import engine
+from app.domain.models import Base
 
 app = FastAPI(title="Mega AI Face Detection API")
 
@@ -14,35 +15,18 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Include routers
+app.include_router(ingest.router, prefix="/streams")
+app.include_router(video.router, prefix="/streams")
+app.include_router(roi.router, prefix="/streams")
+
+
 @app.get("/health")
 async def health():
     return {"status": "ok"}
 
-@app.post("/upload")
-async def upload_video(file: UploadFile = File(...)):
-    """Accept a video file and trigger face detection processing."""
-    # TODO: save video, extract frames, detect faces, store ROIs
-    return {"filename": file.filename, "message": "upload received — processing not yet implemented"}
 
-@app.get("/stream")
-async def stream_video():
-    """Serve processed video stream with ROI overlay."""
-    # TODO: return a stream of annotated frames
-    return {"message": "stream endpoint not yet implemented"}
-
-@app.get("/roi")
-async def get_roi():
-    """Serve ROI data (bounding boxes) per frame."""
-    # TODO: query database and return ROI records
-    return {"message": "roi endpoint not yet implemented"}
-
-@app.websocket("/ws/stream")
-async def websocket_stream(websocket: WebSocket):
-    """WebSocket endpoint for real-time video streaming."""
-    await websocket.accept()
-    try:
-        while True:
-            # TODO: send annotated frames via WebSocket
-            await asyncio.sleep(1)
-    except Exception:
-        await websocket.close()
+@app.on_event("startup")
+async def startup():
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
