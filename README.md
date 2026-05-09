@@ -27,6 +27,8 @@ Containerized backend API that accepts a video feed, detects faces without OpenC
 | Backend API | **https://mega-ai-realtime-facedetect.onrender.com** |
 | API Docs | `https://mega-ai-realtime-facedetect.onrender.com/docs` |
 
+![Demo](ScreenRecording2026-05-09231825-ezgif.com-video-to-gif-converter.gif)
+
 ## Quick Start
 
 ### Prerequisites
