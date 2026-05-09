@@ -3,7 +3,8 @@ from sqlalchemy.orm import declarative_base
 
 Base = declarative_base()
 
-DATABASE_URL = "postgresql+asyncpg://postgres:postgres@db:5432/face_detection"
+# Local PostgreSQL 16
+DATABASE_URL = "postgresql+asyncpg://postgres:postgres@localhost:5433/face_detection"
 
 engine = create_async_engine(DATABASE_URL, echo=False)
 async_session = async_sessionmaker(engine, expire_on_commit=False, class_=AsyncSession)

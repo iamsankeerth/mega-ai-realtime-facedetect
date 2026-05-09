@@ -14,43 +14,39 @@ class DetectionResult:
 
 
 class FaceDetector:
-    """MediaPipe face detection wrapper. No OpenCV imports."""
+    """MediaPipe face detection using Task API (v0.10.35+)."""
 
     def __init__(self, min_detection_confidence: float = 0.5):
-        self._detector = mp.solutions.face_detection.FaceDetection(
-            min_detection_confidence=min_detection_confidence,
-            model_selection=0,  # short-range model, good for webcam/close faces
+        base_options = mp.tasks.BaseOptions(
+            model_asset_path="face_detection_short_range.tflite"
         )
+        options = mp.tasks.vision.FaceDetectorOptions(
+            base_options=base_options,
+            min_detection_confidence=min_detection_confidence,
+        )
+        self._detector = mp.tasks.vision.FaceDetector.create_from_options(options)
 
     def detect(self, image: np.ndarray) -> Optional[DetectionResult]:
-        """
-        Detect face in RGB numpy array.
-        Returns first detection as DetectionResult or None.
-        """
-        # MediaPipe expects RGB uint8
-        if image.dtype != np.uint8:
-            image = (image * 255).astype(np.uint8)
-
-        results = self._detector.process(image)
+        """Detect face in RGB numpy array. Returns first detection or None."""
+        h, w = image.shape[:2]
+        
+        # Convert numpy array to MediaPipe Image
+        mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=image)
+        
+        results = self._detector.detect(mp_image)
         if not results.detections:
             return None
 
-        detection = results.detections[0]  # single-face assumption
-        bbox = detection.location_data.relative_bounding_box
-        h, w = image.shape[:2]
-
-        x = max(0.0, bbox.xmin) * w
-        y = max(0.0, bbox.ymin) * h
-        box_w = bbox.width * w
-        box_h = bbox.height * h
-        confidence = detection.score[0]
-
+        # Take first face
+        detection = results.detections[0]
+        bbox = detection.bounding_box
+        
         return DetectionResult(
-            x=x,
-            y=y,
-            w=box_w,
-            h=box_h,
-            confidence=confidence,
+            x=float(bbox.origin_x),
+            y=float(bbox.origin_y),
+            w=float(bbox.width),
+            h=float(bbox.height),
+            confidence=float(detection.categories[0].score),
         )
 
     def close(self):
