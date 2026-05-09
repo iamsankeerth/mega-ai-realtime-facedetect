@@ -31,7 +31,7 @@ class StreamStats:
     frame_count: int = 0
     detected_count: int = 0
     dropped_count: int = 0
-    last_frame_at: float = field(default_factory=time.time)
+    last_frame_at: float = 0.0
     bytes_received: int = 0
     bytes_annotated: int = 0
 
