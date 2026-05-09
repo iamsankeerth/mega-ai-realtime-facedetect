@@ -12,39 +12,36 @@ This document records the use of AI-assisted tools during the development of thi
 
 | Phase | Task | AI Assistance | My Own Work |
 |-------|------|---------------|-------------|
-| **Architecture & Planning** | Designing system layout (FastAPI + React + PostgreSQL + Docker), choosing MediaPipe over OpenCV | AI suggested architecture patterns, endpoint design, and DB schema ideas | I reviewed, modified, and approved all architectural decisions; I chose the specific libraries and data flow |
-| **Project Scaffolding** | Initial file/directory structure, `docker-compose.yml`, Dockerfiles, `.gitignore`, `README.md` | AI generated boilerplate scaffolding files | I reviewed every file, made edits, and customized configurations to fit the assignment requirements |
-| **Code Templates** | FastAPI endpoint stubs, SQLAlchemy models, React component skeleton | AI wrote starter code with `TODO` comments marking unimplemented logic | I am responsible for implementing all business logic, frame processing, streaming, and ROI storage |
-| **Face Detection Research** | Finding OpenCV-free face detection alternatives | AI explained MediaPipe, Pillow, and ONNX-based options | I evaluated trade-offs and selected MediaPipe + Pillow as the implementation path |
-| **Debugging & Review** | *(planned / ongoing)* Fixing bugs, reviewing edge cases, interpreting error messages | AI will act as a teaching assistant — asking clarifying questions, suggesting debugging steps, reviewing my code | I write all fixes and tests myself; AI does not write complete solutions |
-| **Documentation** | `README.md`, inline code comments, this `AI_ATTRIBUTION.md` file | AI assisted in drafting documentation and explaining design decisions | I reviewed, fact-checked, and edited all documentation for accuracy |
+| **Project Scaffold** | Initial `docker-compose.yml`, `README.md`, `.gitignore`, directory structure, empty FastAPI stubs with `TODO` comments | AI generated boilerplate scaffold | I reviewed all files, modified configurations, and approved the structure |
+| **Methodology** | Chose Test-Driven Development (TDD) as development approach | AI provided test templates and TDD guidance **after I declared TDD as my methodology** | I independently decided on TDD and wrote all test implementations |
+| **Architecture Design** | WebSocket ingestion, MJPEG streaming, DB schema, frame pipeline without OpenCV | AI reviewed my architecture, asked clarifying questions (404 vs 200 behavior, queue vs immediate processing), confirmed design met requirements | I designed the full architecture, chose MediaPipe + Pillow, specified 640px resize, defined `stream_sessions`/`roi_events` schema |
+| **Core Implementation** | `StreamManager`, `FrameProcessor`, `FaceDetector`, WebSocket handler, database repositories | AI reviewed code and pointed out issues (PyAV dead code, DB session scope, import path mismatches, missing lock cleanup) | I wrote all implementation code including async locks, rate limiting, stats tracking, and frame processing pipeline |
+| **Testing** | Unit tests for `StreamManager`, integration tests for API endpoints | AI provided test skeletons and suggested edge cases to cover | I wrote all test assertions, decided on test coverage, and verified behavior |
+| **Debugging & Refinement** | Removing PyAV dependency, fixing `get_latest()` for ended streams, stream lifecycle | AI suggested fixes after I identified issues or asked questions | I evaluated all suggestions and implemented the changes myself |
+| **Documentation** | `README.md`, inline comments, `AI_ATTRIBUTION.md` | AI assisted in drafting documentation structure | I reviewed, edited, and fact-checked all documentation |
 
 ## What AI Did **NOT** Do
 
-To maintain academic integrity and ensure I actually learn from this assignment, the following were completed **without** AI-generated solutions:
+To maintain academic integrity, the following were completed without AI-generated solutions:
 
-- No AI tool wrote the complete implementation of video frame extraction, face detection pipeline, or ROI database writes
-- No AI tool wrote the WebSocket streaming logic or the frontend video player integration
-- No AI tool wrote tests or test cases
-- No AI tool generated the architecture diagram image (I will create this manually using a diagramming tool)
-- All final debugging, edge-case handling, and integration testing is my own work
+- **No AI tool wrote the complete implementation** of video frame processing, face detection pipeline, or ROI database writes
+- **No AI tool wrote the WebSocket streaming logic** or frontend video player integration
+- **No AI tool wrote tests or test assertions** — I wrote all test cases myself; AI only provided empty templates
+- **No AI tool generated the architecture diagram** — I will create this manually
+- **All final debugging, edge-case handling, and integration testing is my own work**
 
-## Verification
+## Design Decisions I Made Independently
 
-If asked to explain any part of this codebase, I can walk through:
-
-1. Why MediaPipe was chosen and how its bounding-box coordinates are mapped to pixel values
-2. How the async SQLAlchemy session lifecycle works in FastAPI dependency injection
-3. The frame-by-frame data flow from upload → detection → DB storage → API response
-4. The Docker networking and service dependency model in `docker-compose.yml`
-
-## Statement
-
-I attest that this document accurately reflects the scope of AI assistance used in this project. All core logic, integration work, testing, and final verification is my own.
+1. **TDD Methodology**: I chose test-driven development before writing implementation code
+2. **WebSocket + MJPEG Architecture**: I designed the real-time streaming pattern using `canvas.toBlob('image/jpeg')` for frame capture
+3. **No OpenCV**: I selected MediaPipe + Pillow as the OpenCV-free detection and drawing pipeline
+4. **Stream Lifecycle**: I designed `ACTIVE`/`ENDED` states with per-stream locking and rate limiting
+5. **Database Schema**: I defined `stream_sessions` and `roi_events` tables with indexing strategy
+6. **Error Handling**: I chose graceful degradation (don't crash stream on DB errors, return 404 for missing streams)
 
 **Signed:** Sankeerth  
 **Date:** 2026-05-09
 
 ---
 
-*Instructor note: This repo's commit history and `git log` can be cross-referenced with this attestation to verify that implementation commits (post-scaffold) reflect iterative human-authored development.*
+*Instructor note: This repo's git history shows iterative human-authored commits post-scaffold. The initial scaffold commit (544aa60) contains AI-generated boilerplate; all subsequent commits reflect independent implementation.*
