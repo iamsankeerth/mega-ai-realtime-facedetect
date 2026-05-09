@@ -3,6 +3,8 @@
 ## Overview
 Containerized backend API that accepts a video feed, detects faces without OpenCV, stores ROIs in PostgreSQL, and streams annotated video to a React frontend.
 
+> **Note on OpenCV**: The assignment requires drawing the ROI without using the OpenCV Python library (`cv2`). Our application code uses **Pillow** (`PIL.ImageDraw`) exclusively for drawing bounding boxes. MediaPipe (our face detection library) installs `opencv-contrib-python` as an internal transitive dependency for its own image processing, but our code never imports or uses `cv2` for frame manipulation or drawing.
+
 ## Architecture
 
 ```
@@ -25,24 +27,24 @@ Containerized backend API that accepts a video feed, detects faces without OpenC
 
 ### Run Locally
 ```bash
-git clone https://github.com/YOUR_USERNAME/mega-ai-face-detection.git
-cd mega-ai-face-detection
+git clone https://github.com/iamsankeerth/mega-ai-realtime-facedetect.git
+cd mega-ai-realtime-facedetect
 docker-compose up --build
 ```
 
-The app will be available at `http://localhost:3000` (frontend) and `http://localhost:8000` (backend API docs at `/docs`).
+The app will be available at `http://localhost:13000` (frontend) and `http://localhost:18000` (backend API docs at `/docs`).
 
 ## API Endpoints
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| POST | `/upload` | Upload video file for processing |
-| GET | `/stream` | Stream processed video with ROI overlay |
-| GET | `/roi` | Get ROI data (bounding boxes) per frame |
+| WebSocket | `/streams/{stream_id}/ingest` | Receive real-time JPEG frames from camera |
+| GET | `/streams/{stream_id}/video` | Stream annotated MJPEG with ROI overlay |
+| GET | `/streams/{stream_id}/rois` | Get ROI data (bounding boxes) per frame |
 
 ## Tech Stack
-- **Backend**: Python, FastAPI, MediaPipe (face detection), SQLAlchemy, asyncpg
-- **Frontend**: React.js, HTML5 Video/WebSocket
+- **Backend**: Python, FastAPI, MediaPipe (face detection), Pillow (ROI drawing — no OpenCV), SQLAlchemy, asyncpg
+- **Frontend**: React.js, Vite, HTML5 Canvas/WebSocket
 - **Database**: PostgreSQL
 - **Infrastructure**: Docker, Docker Compose
 
