@@ -83,6 +83,6 @@ Thumbs.db
 *.sqlite
 *.sqlite3
 
-# Assignment artifacts
-ARCHITECTURE.png
-ARCHITECTURE.jpg
+# Assignment artifacts (keep these in repo for submission)
+# ARCHITECTURE.png
+# ARCHITECTURE.jpg
