@@ -6,7 +6,6 @@ This document records the use of AI-assisted tools during the development of thi
 
 - **OpenCode (powered by kimi-k2.6)** — Interactive coding agent / conversational assistant
 - **GitHub Copilot** — Inline auto-complete code suggestions in VS Code
-- **ChatGPT / Claude / Gemini** *(if used, toggle as applicable)* — General Q&A and debugging
 
 ## How AI Was Used
 
